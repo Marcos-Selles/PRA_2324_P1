@@ -6,11 +6,12 @@
 #include <stdexcept>  // Para std::out_of_range
 
 template <typename T>
-class ListArray : public List<T> {
+class ListArray : private List<T> {
 private:
     T* arr;  // Puntero al inicio del array
     int max; // Tamaño actual del array
     int n;   // Número de elementos
+    int numElements;
     static const int MINSIZE = 2; // Tamaño mínimo del array
     void resize(int new_size) {
         T* new_arr = new T[new_size];
@@ -41,15 +42,7 @@ public:
     }
 
     // Redimensiona el array al tamaño especificado
-    void resize(int new_size) {
-        T* new_arr = new T[new_size];
-        for (int i = 0; i < n; i++) {
-            new_arr[i] = arr[i];
-        }
-        delete[] arr;
-        arr = new_arr;
-        max = new_size;
-    }
+    
 
     // Resto de las funciones heredadas de la clase List
     void insert(int pos, T e) {
