@@ -9,40 +9,17 @@
 
 template <typename T>
 class List {
+private:
+    T* elements;  // Array para almacenar los elementos
+    int numElements; // Número actual de elementos
 public:
-    // Constructor
-    List(int initialCapacity) : capacity(initialCapacity), numElements(0) {
-        elements = new T[capacity];
-    }
-
-    // Destructor
-    ~List() {
-        delete[] elements;
-    }
-
     // Inserta el elemento e en la posición pos
     void insert(int pos, T e) {
         if (pos < 0 || pos > numElements) {
             throw std::out_of_range("Posición no válida");
         }
 
-        if (numElements >= capacity) {
-            // Redimensiona el array si es necesario
-            capacity *= 2;
-            T* newElements = new T[capacity];
-            for (int i = 0; i < numElements; i++) {
-                newElements[i] = elements[i];
-            }
-            delete[] elements;
-            elements = newElements;
-        }
-
-        // Desplaza los elementos a la derecha para hacer espacio para el nuevo elemento
-        for (int i = numElements; i > pos; i--) {
-            elements[i] = elements[i - 1];
-        }
-
-        // Inserta el nuevo elemento en la posición pos
+       
         elements[pos] = e;
         numElements++;
     }
@@ -57,22 +34,19 @@ public:
         insert(0, e);
     }
 
-    // Elimina y devuelve el elemento situado en la posición pos
+    // Elimina el elemento en la posición pos
     T remove(int pos) {
-        if (pos < 0 || pos >= numElements) {
-            throw std::out_of_range("Posición no válida");
-        }
-
-        T removedElement = elements[pos];
-
-        // Desplaza los elementos a la izquierda para llenar el espacio dejado por el elemento eliminado
-        for (int i = pos; i < numElements - 1; i++) {
-            elements[i] = elements[i + 1];
-        }
-
-        numElements--;
-        return removedElement;
+    if (pos < 0 || pos >= numElements) {
+        throw std::out_of_range("Posición no válida");
     }
+
+    T removedElement = elements[pos];
+
+    numElements--;
+
+    return removedElement;
+}
+
 
     // Devuelve el elemento situado en la posición pos
     T get(int pos) {
@@ -103,10 +77,7 @@ public:
         return numElements;
     }
 
-private:
-    T* elements;  // Array para almacenar los elementos
-    int capacity; // Capacidad máxima de la lista
-    int numElements; // Número actual de elementos
+    
 };
 #endif
 

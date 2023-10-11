@@ -12,9 +12,18 @@ private:
     int max; // Tamaño actual del array
     int n;   // Número de elementos
     static const int MINSIZE = 2; // Tamaño mínimo del array
+    void resize(int new_size) {
+        T* new_arr = new T[new_size];
+        for (int i = 0; i < n; i++) {
+            new_arr[i] = arr[i];
+        }
+        delete[] arr;
+        arr = new_arr;
+        max = new_size;
+    }
 
 public:
-    ListArray() : max(MINSIZE), n(0) {
+    ListArray() : max(MINSIZE),n(0), numElements(0){
         arr = new T[max];
     }
 
@@ -44,35 +53,64 @@ public:
 
     // Resto de las funciones heredadas de la clase List
     void insert(int pos, T e) {
-        // Implementación de insert
+        if (pos < 0 || pos > numElements) {
+            throw std::out_of_range("Posición no válida");
+        } arr[pos] = e;
+        numElements++;
     }
 
     void append(T e) {
         // Implementación de append
+        insert(numElements, e);
+    
     }
 
     void prepend(T e) {
         // Implementación de prepend
+        insert(0, e);
     }
 
     T remove(int pos) {
         // Implementación de remove
+    if (pos < 0 || pos >= numElements) {
+        throw std::out_of_range("Posición no válida");
+    }
+
+    T removedElement = arr[pos];
+
+    numElements--;
+
+    return removedElement;
     }
 
     T get(int pos) {
         // Implementación de get
+        
+    if (pos < 0 || pos >= numElements) {
+            throw std::out_of_range("Posición no válida");
+        }
+
+        return arr[pos];
     }
 
     int search(T e) {
         // Implementación de search
+    for (int i = 0; i < numElements; i++) {
+            if (arr[i] == e) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     bool empty() {
         // Implementación de empty
+    return numElements == 0;
     }
 
     int size() {
         // Implementación de size
+    return numElements;
     }
 
     // Sobrecarga global del operador <<
