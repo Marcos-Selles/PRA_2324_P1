@@ -1,6 +1,14 @@
-bin/testListArray: TestListArray.cpp ListArray.h List.h
-	mkdir -p bin	
-	g++ -o bin/testListArray TestListArray.cpp ListArray.h
+bin/testListArray:	testlistArray.cpp	ListArray.h	List.h
+	mkdir	-p	bin
+	g++	-o	bin/testListArray	testListArray.cpp	ListArray.h
+
+bin/testListLinked:	testlistLinked.cpp	ListLinked.h	List.h
+	mkdir	-p	bin
+	g++	-o	bin/testListLinked	testListLinked.cpp	ListLinked.h
+
+bin/testNode:	testNode.cpp Node.h
+	mkdir	-p	bin
+	g++	-o	bin/testNode	testNode.cpp	Node.h
 
 clean:
-	rm -r *.o *.gch bin
+	rm	-r	*.o	*.gch	bin
