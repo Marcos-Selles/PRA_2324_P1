@@ -1,118 +1,296 @@
-#ifndef LISTARRAY_H
-#define LISTARRAY_H
+#include <ostream>
+#include<iostream>
+#include<exception>
 #include "List.h"
-#include <ostream>   // Para que la sobrecarga del operador funcione correctamente 
-#include <iostream>  // Para std::ostream
-#include <stdexcept>  // Para std::out_of_range
 
-template <typename T>
-class ListArray : private List<T> {
-private:
-    T* arr;  // Puntero al inicio del array
-    int max; // Tamaño actual del array
-    int n;   // Número de elementos
-    int numElements;
-    static const int MINSIZE = 2; // Tamaño mínimo del array
-    void resize(int new_size) {
-        T* new_arr = new T[new_size];
-        for (int i = 0; i < n; i++) {
-            new_arr[i] = arr[i];
+template <typename T> 
+class ListArray : public List<T> {
+
+    private:
+
+//Puntero al inicio del array que almacenará los elementos de la lista de forma contigua. Estos elementos son de tipo T genérico.
+
+        T* arr;
+
+//Tamaño actual del array. Podrá alterarse durante la vida de la lista, en caso necesario (ver método resize(int)).
+
+	int max;
+
+//Número de elementos que contiene la lista.
+
+	int n;
+
+//Tamaño mínimo del array. Deberá inicializarse a 2. 
+
+	static const int MINSIZE = 2;		
+
+
+//Método privado que se encargará de redimensionar el array al tamaño especificado, con el objetivo de incrementar su capacidad (si está lleno), o bien para reducirla (si está "demasiado vacío"). Ver nota más abajo para más detalles.
+
+	void resize(int new_size){
+
+                if(new_size < max){
+
+                        T* arr_new = new T[new_size];
+
+                        max = new_size;
+
+		        for(int pos = 0; pos < n ; pos++){
+			
+			        arr_new[pos] = arr[pos];
+
+        		}
+
+                        delete[] arr;
+                
+                        arr = arr_new;
+                
+                }else{
+
+                        T* arr_new = new T[new_size];
+
+                        max = new_size;
+
+
+		        for(int pos = 0; pos < n; pos++){
+			
+			        arr_new[pos] = arr[pos];                        
+
+		        }       
+
+                        delete[] arr;
+
+                        arr = arr_new;
+
+                }
+
+
+	}
+  
+
+    public:
+//Método constructor sin argumentos. Se encargará de reservar memoria dinámica para crear un array de MINSIZE elementos de tipo T, además de inicializar el resto de atributos de instancia. 
+
+        ListArray(){
+
+               arr = new T[MINSIZE];
+
+                n = 0;
+
+                max = MINSIZE;
+
+
+	}
+
+//Método destructor. 
+
+	~ListArray(){
+
+                delete[] arr;
+
         }
-        delete[] arr;
-        arr = new_arr;
-        max = new_size;
-    }
 
-public:
-    ListArray() : max(MINSIZE),n(0), numElements(0){
-        arr = new T[max];
-    }
+//Sobrecarga del operador []. Devuelve el elemento situado en pos. Lanza una excepción si la posición no es válida (fuera del intervalo).
 
-    ~ListArray() {
-        delete[] arr;
-    }
+	T operator[](int pos){
 
-    // Sobrecarga del operador []
-    T operator[](int pos) {
-        if (pos < 0 || pos >= n) {
-            throw std::out_of_range("Posición no válida");
-        }
+                if(pos <= max-1 && pos >= 0){
 
-        return arr[pos];
-    }
+                        return arr[pos];
 
-    // Redimensiona el array al tamaño especificado
-    
+                }else{
 
-    // Resto de las funciones heredadas de la clase List
-    void insert(int pos, T e) {
-        if (pos < 0 || pos > numElements) {
-            throw std::out_of_range("Posición no válida");
-        } arr[pos] = e;
-        numElements++;
-    }
+                     throw std::out_of_range ("la posición no es válida");
 
-    void append(T e) {
-        // Implementación de append
-        insert(numElements, e);
-    
-    }
+                }
 
-    void prepend(T e) {
-        // Implementación de prepend
-        insert(0, e);
-    }
+	}
 
-    T remove(int pos) {
-        // Implementación de remove
-    if (pos < 0 || pos >= numElements) {
-        throw std::out_of_range("Posición no válida");
-    }
+//Sobrecarga global del operador << para imprimir una instancia de ListArray<T> por pantalla. Recuerda incluir la cabecera <ostream> en el .h.
 
-    T removedElement = arr[pos];
+	friend std::ostream& operator<<(std::ostream &out,const ListArray<T> &list){
 
-    numElements--;
+		for(int i = 0; i < list.size(); i ++){
 
-    return removedElement;
-    }
+                       out << list.arr[i]<<std::endl;
 
-    T get(int pos) {
-        // Implementación de get
+
+                       
+                }
+         return out;       
+	}
+
+       // inserta el elemento e en la posición pos. Lanza una excepción std::out_of_range si la posición pos no es válida (fuera del intervalo [0, size()]).
+                
+	void insert(int pos, T e) override {
+
+                if(pos < 0 || pos > size()){
+
+
+                        throw std::out_of_range("Posición no válida");
+
+                }else{
+
+                        if( size() == max ){
+
+                                int new_size = max * 2;
+
+                                resize(new_size);
+
+                        }
+
+                        for(int i = size() ; i > pos ; i--){
+
+                               
+                                 arr[i] = arr[i-1];
+
+                        }
         
-    if (pos < 0 || pos >= numElements) {
-            throw std::out_of_range("Posición no válida");
-        }
+                         arr[pos] = e;
+                         n++;
 
-        return arr[pos];
-    }
+                }
 
-    int search(T e) {
-        // Implementación de search
-    for (int i = 0; i < numElements; i++) {
-            if (arr[i] == e) {
-                return i;
+
+	}
+
+        //inserta un elemento al final de la lista, para ello habrá que tener en cuenta que haya  espacio en el la lista
+
+	void append(T e) override {
+
+            if( n == max -1 ){
+
+                int new_size = max * 2;
+
+                resize(new_size);
+
+                arr[n + 1] = e;
+
+            }else{
+
+		arr[n + 1] = e;
+
             }
-        }
-        return -1;
-    }
+            n++;
+	}	
 
-    bool empty() {
-        // Implementación de empty
-    return numElements == 0;
-    }
+	void prepend(T e) override  {
 
-    int size() {
-        // Implementación de size
-    return numElements;
-    }
+            if( n == max -1 ){
+                
+                int new_size = max * 2;
 
-    // Sobrecarga global del operador <<
-    friend std::ostream& operator<<(std::ostream& out, const ListArray<T>& list) {
-        for (int i = 0; i < list.n; i++) {
-            out << list.arr[i] << ' ';
-        }
-        return out;
-    }
+                resize(new_size);
+
+                for(int i = n; i >= 0 ; i--){
+
+                        arr[i + 1] = arr[i];
+
+                }
+
+                arr[0] = e;
+
+
+            }else{
+
+                
+                for(int i = n; i >= 0; i-- ){
+
+                        arr[i + 1] = arr[i];
+
+
+                }
+
+                arr[0] = e;
+            
+            }
+
+                n++;
+
+	}
+
+        //Elimina y devuelve el elemento situado en la posición pos. Lanza una excepción std::out_of_range si la posición no es válida (fuera del intervalo [0, size()-1]).
+
+	T remove(int pos) override  {
+
+
+                if(pos > size()-1 || pos < 0){
+                        
+		        throw std::out_of_range("posición no válida");
+                }
+
+                
+                int var_ret_pos = arr[pos];
+
+                for(int i = pos +1; i < n; i++){
+
+                      arr[i-1] = arr[i];
+ 
+                }
+
+                 
+                n--;
+
+                return var_ret_pos;	
+
+
+		
+	}	
+//Devuelve el elemento situado en la posición pos. Lanza una excepción std::out_of_range si la posición no es válida (fuera del intervalo [0, size()-1]).
+	
+        T get(int pos) const override  {
+
+		if(pos > size()-1 || pos < 0){
+
+		        throw std::out_of_range("posición no válida");
+
+		}else{	
+		
+			return arr[pos];
+                
+                }	
+
+
+
+	}
+//Devuelve la posición en la que se encuentra la primera ocurrencia del elemento e, o -1 si no se encuentra.
+	int search(T e) const override  {
+
+		int i = 0;
+
+		for(; i <= n ; i++){
+
+			if(arr[i] == e){
+
+				return i;
+
+			}
+
+                }
+		
+		return -1;
+
+	}
+
+	bool empty() const override   {
+
+		if(arr == nullptr){
+
+                        return true;
+
+                }else{
+
+                        return false;
+
+                }
+
+
+	}
+
+	int size() const override  {
+
+                return n;
+	}
+
+  
 };
-#endif
-
