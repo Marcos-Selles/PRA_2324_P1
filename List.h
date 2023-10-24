@@ -1,83 +1,30 @@
-
-
-
-
-
 #ifndef LIST_H
 #define LIST_H
-#include <stdexcept>  // Para std::out_of_range
 
-template <typename T>
+template <typename T> 
 class List {
-private:
-    T* elements;  // Array para almacenar los elementos
-    int numElements; // Número actual de elementos
-public:
-    // Inserta el elemento e en la posición pos
-    void insert(int pos, T e) {
-        if (pos < 0 || pos > numElements) {
-            throw std::out_of_range("Posición no válida");
-        }
+    public:
+        
+	virtual void insert(int pos, T e) = 0;
+	
+	virtual void append(T e)  = 0;
 
-       
-        elements[pos] = e;
-        numElements++;
-    }
+	virtual void prepend(T e) = 0;
 
-    // Inserta el elemento e al final de la lista
-    void append(T e) {
-        insert(numElements, e);
-    }
+	virtual T remove(int pos) = 0;
 
-    // Inserta el elemento e al principio de la lista
-    void prepend(T e) {
-        insert(0, e);
-    }
+	virtual T get(int pos) const = 0;
 
-    // Elimina el elemento en la posición pos
-    T remove(int pos) {
-    if (pos < 0 || pos >= numElements) {
-        throw std::out_of_range("Posición no válida");
-    }
+	virtual int search(T e) const = 0;
 
-    T removedElement = elements[pos];
+        virtual bool empty() const = 0;
 
-    numElements--;
-
-    return removedElement;
-}
+	virtual int size() const = 0; 
 
 
-    // Devuelve el elemento situado en la posición pos
-    T get(int pos) {
-        if (pos < 0 || pos >= numElements) {
-            throw std::out_of_range("Posición no válida");
-        }
 
-        return elements[pos];
-    }
-
-    // Devuelve la posición en la que se encuentra la primera ocurrencia del elemento e, o -1 si no se encuentra
-    int search(T e) {
-        for (int i = 0; i < numElements; i++) {
-            if (elements[i] == e) {
-                return i;
-            }
-        }
-        return -1;  // No se encontró el elemento
-    }
-
-    // Indica si la lista está vacía
-    bool empty() {
-        return numElements == 0;
-    }
-
-    // Devuelve el número de elementos de la lista
-    int size() {
-        return numElements;
-    }
-
-    
 };
-#endif
 
+
+
+#endif
